@@ -1,0 +1,22 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - nvm use 20
+        - corepack enable
+        - corepack prepare pnpm@latest-10 --activate
+        - pnpm config set store-dir .pnpm-store
+        - pnpm install --frozen-lockfile
+    build:
+      commands:
+        - if [ "${AWS_BRANCH}" = "develop" ] || [[ "${AWS_BRANCH}" == release/* ]]; then pnpm run build --mode test;
+        - else pnpm run build; fi
+  artifacts:
+    baseDirectory: dist
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - .pnpm-store/**/*
+      - node_modules/**/*
